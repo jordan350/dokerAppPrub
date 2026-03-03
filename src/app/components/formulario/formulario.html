@@ -2,22 +2,30 @@
   <div class="col-md-10">
     <div class="card shadow-lg border-0">
       <div class="card-header bg-primary text-white py-3">
-        <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Registro de Datos</h4>
+        <h4 class="mb-0">
+          <i class="bi bi-pencil-square me-2"></i>
+          {{ editandoId ? 'Editar Registro' : 'Registro de Datos' }}
+        </h4>
       </div>
       <div class="card-body p-4">
+        <!-- Mensaje de estado -->
+        <div *ngIf="mensaje" [ngClass]="tipoMensaje === 'exito' ? 'alert alert-success' : 'alert alert-danger'" role="alert">
+          {{ mensaje }}
+        </div>
+
         <form (ngSubmit)="enviarDatos()" class="row g-3">
           
           <div class="col-md-2">
             <label class="form-label fw-bold">ID (Entero)</label>
-            <input type="number" name="id" [(ngModel)]="nuevoRegistro.id" class="form-control" placeholder="Autoincremental">
+            <input type="number" name="id" [(ngModel)]="nuevoRegistro.id" class="form-control" placeholder="Autoincremental" disabled>
           </div>
           <div class="col-md-6">
             <label class="form-label fw-bold">Nombre (Carácter)</label>
-            <input type="text" name="nombre" [(ngModel)]="nuevoRegistro.nombre" class="form-control" required>
+            <input type="text" name="nombre" [(ngModel)]="nuevoRegistro.nombre" class="form-control" required [disabled]="cargando">
           </div>
           <div class="col-md-4">
             <label class="form-label fw-bold">Categoría (Carácter)</label>
-            <select name="categoria" [(ngModel)]="nuevoRegistro.categoria" class="form-select">
+            <select name="categoria" [(ngModel)]="nuevoRegistro.categoria" class="form-select" [disabled]="cargando">
               <option value="">Seleccione...</option>
               <option value="Hardware">Hardware</option>
               <option value="Software">Software</option>
@@ -27,27 +35,35 @@
 
           <div class="col-md-4">
             <label class="form-label fw-bold">Fecha (Fecha)</label>
-            <input type="date" name="fecha" [(ngModel)]="nuevoRegistro.fecha" class="form-control">
+            <input type="date" name="fecha" [(ngModel)]="nuevoRegistro.fecha" class="form-control" [disabled]="cargando">
           </div>
           <div class="col-md-4">
             <label class="form-label fw-bold">Cantidad (Entero)</label>
-            <input type="number" name="cantidad" [(ngModel)]="nuevoRegistro.cantidad" class="form-control">
+            <input type="number" name="cantidad" [(ngModel)]="nuevoRegistro.cantidad" class="form-control" [disabled]="cargando">
           </div>
           <div class="col-md-4 d-flex align-items-end">
             <div class="form-check form-switch mb-2">
-              <input type="checkbox" name="esActivo" [(ngModel)]="nuevoRegistro.esActivo" class="form-check-input" id="swActivo">
+              <input type="checkbox" name="esActivo" [(ngModel)]="nuevoRegistro.esActivo" class="form-check-input" id="swActivo" [disabled]="cargando">
               <label class="form-check-label fw-bold" for="swActivo">¿Está activo? (Booleano)</label>
             </div>
           </div>
 
           <div class="col-12">
             <label class="form-label fw-bold">Descripción (Carácter)</label>
-            <textarea name="descripcion" [(ngModel)]="nuevoRegistro.descripcion" class="form-control" rows="2" placeholder="Detalles del registro..."></textarea>
+            <textarea name="descripcion" [(ngModel)]="nuevoRegistro.descripcion" class="form-control" rows="2" placeholder="Detalles del registro..." [disabled]="cargando"></textarea>
           </div>
 
-          <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-success btn-lg w-100 shadow">
-              <i class="bi bi-cloud-arrow-up me-2"></i>Guardar en Base de Datos
+          <div class="col-12 mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-success btn-lg flex-grow-1 shadow" [disabled]="cargando">
+              <span *ngIf="!cargando">
+                <i class="bi bi-cloud-arrow-up me-2"></i>{{ editandoId ? 'Actualizar' : 'Guardar' }} en Base de Datos
+              </span>
+              <span *ngIf="cargando">
+                <i class="bi bi-hourglass-split me-2"></i>Procesando...
+              </span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg shadow" (click)="cancelar()" [disabled]="cargando">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
             </button>
           </div>
         </form>
