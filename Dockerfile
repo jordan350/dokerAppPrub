@@ -1,14 +1,15 @@
-# Paso 1: Construcción (Build)
-FROM node:18-alpine as build-step
+# Paso 1: Build Angular (Angular 21 requiere Node >= 20.19)
+FROM node:20.19-alpine AS build
 WORKDIR /app
-COPY package.json ./
-RUN npm install
+
+COPY package*.json ./
+RUN npm ci
+
 COPY . .
 RUN npm run build
 
-# Paso 2: Servidor Web (Nginx)
+# Paso 2: Servir estático con Nginx
 FROM nginx:alpine
-# OJO: ruta coincida con el /dist
-COPY --from=build-step /app/dist/mi-app-web /usr/share/nginx/html
+COPY --from=build /app/dist/dokerAppPrub/browser/ /usr/share/nginx/html/
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
