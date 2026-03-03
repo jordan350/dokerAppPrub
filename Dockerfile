@@ -8,7 +8,7 @@ RUN npm run build
 
 # Paso 2: Servidor Web (Nginx)
 FROM nginx:alpine
-# OJO: Asegúrate de que la ruta coincida con el nombre de tu app en /dist
+# OJO: ruta coincida con el /dist
 COPY --from=build-step /app/dist/mi-app-web /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
