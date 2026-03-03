@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,13 +31,22 @@ export class FormularioComponent implements OnInit {
   constructor(
     private registroService: RegistroService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    // Verificar si estamos editando (se pasa el ID como parámetro de query)
-    this.activatedRoute.queryParams.subscribe(params => {
+    // Verificar si estamos editando (se pasa el ID como parámetro de ruta o query)
+    // Primero intentamos obtenerlo de los route params (:id), luego de query params (?id=)
+    this.activatedRoute.params.subscribe(params => {
       if (params['id']) {
+        this.cargarRegistro(Number(params['id']));
+      }
+    });
+    
+    // También escuchamos queryParams por retrocompatibilidad
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (params['id'] && !this.editandoId) {
         this.cargarRegistro(Number(params['id']));
       }
     });
@@ -57,6 +66,7 @@ export class FormularioComponent implements OnInit {
         this.nuevoRegistro = data;
         this.editandoId = id;
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar el registro:', err);
